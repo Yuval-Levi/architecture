@@ -1,0 +1,47 @@
+Hi all,
+I will try to summerize all the things that passed through my mind while making my POC - AudioCommon plugin:
+1. Navigation within clouds: 
+    1. My plug let one add/remove a repository from a closed list of repositories. Currently the list is static, I intend to expand it
+    during the lifecycle of the project but that depands on the support of each cloud I am adding. Right now the only one that are supported
+    are freesound, jamendo, soundcloud. 
+    I suggest that getting this list should be a web service which returns all supported repositories (clouds) which implements the 
+    AudioCommonsReposirotyAPI (which I will discuss later on). This way user can select whatever he likes from the list in the echo-system.
+    
+    2. AudioCommonsReposirotyAPI: 
+    Basically this API is the search/navigate REST API which all repositories should support.
+    In my current POC, after user add/remove a repository, the search operation runs on all connected repositories and returns
+    a scrollable-result set which merge all of them. This implies that: the repository should support at least nextPage() call.
+    It could be much better if the cloud supports also navigation calls such as: getItems(startOffset,nuItems) which enable user to
+    navigate however he likes (more flexible then page-model-navigation).
+    Another thing which may help a lot is the getCount() of the result set. This is an important data that user expects to get.
+    In freesound for example I can get the total number of items from a search operation, in SoundCloud and Jamendo I cannot, so
+    user should go on to next pages until he reach the end, and he cannot assess his search. User might change the search criteria
+    if he know the size of the returned result set!
+    I would consider that each cloud should declare its abilities.
+      boolean supportSeek()
+      boolean supportScroll()
+    For the search criteria - filters and fields the same approach of inspection:
+      list<Field> getSupportedFields() -> Where Field is some class/json/xml/whatever structure which contain its name, type, etc..
+      list<Filter> getSupportedFilters() -> Where Filter is some class/json/xml/whatever structure which contain its name, type, etc..
+      getSearchAPI() -> Should return the API declaration of the search API (similar to java inspection).
+      
+    If reposiroties will support some of this features, this can enable creation of applications which dynamically change
+    their UI according to the cloud abilities, which in turn make a much better usage experience to the user.
+    
+    3. Write operations:
+      Again, cloud should declare if it enables it. I would expect some kind of licensing API declaration:
+      list<License> getLicenseList -> return list of supported License objects. In my POC there are 3 clouds each support in 
+      different types of license. Most of them has also extra-licensing strategy of their own... This complicates the situation
+      much more. Here again, if we want to make it easier for future players, we should at least force them just to state what
+      they support in terms of functions and objects. This way we can generate again for each cloud its own customized UI screen
+      without the application maker work for customization and without the need of the cloud to adjust its own properties to some
+      global ones. (though it would be much better if everyone will talk in the same language in terms of functions/objects)
+    
+  P.s
+  Pardon my English! I will update this document later on with some Python samples from my POC.
+  I hope it helps in some way.
+  
+  Best regards,
+  Yuval.
+      
+      
